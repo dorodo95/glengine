@@ -125,9 +125,8 @@ int main()
 #pragma endregion
 
 	//Texture Allocation
-	TextureInitializer textureObject("Assets/Textures/kirbo.png", 0);
-
-	Shader meshShader("Shaders/vsh.glsl", "Shaders/fsh.glsl"); //Shader Declaration from Shader.cpp
+	TextureInitializer textureObject("../../Bin/Assets/Textures/kirbo.png", 0);
+	Shader meshShader("../../Bin/Shaders/vsh.glsl", "../../Bin/Shaders/fsh.glsl"); //Shader Declaration from Shader.cpp
 
 #pragma region Render Loop
 	//Render Loop
