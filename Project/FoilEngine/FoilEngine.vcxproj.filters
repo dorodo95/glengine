@@ -27,11 +27,20 @@
     <ClCompile Include="..\Source\Private\Window.cpp">
       <Filter>Source Files\Private</Filter>
     </ClCompile>
-    <ClCompile Include="..\Source\Private\TextureInitializer.cpp">
+    <ClCompile Include="..\Source\Private\Texture.cpp">
       <Filter>Source Files\Private</Filter>
     </ClCompile>
     <ClCompile Include="..\Source\Private\Shader.cpp">
       <Filter>Source Files\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Private\TransformHelper.cpp">
+      <Filter>Source Files\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Private\Mesh.cpp">
+      <Filter>Source Files\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Private\Material.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -41,8 +50,17 @@
     <ClInclude Include="..\Source\Public\Shader.h">
       <Filter>Source Files\Public</Filter>
     </ClInclude>
-    <ClInclude Include="..\Source\Public\TextureInitializer.h">
+    <ClInclude Include="..\Source\Public\Texture.h">
       <Filter>Source Files\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Public\TransformHelper.h">
+      <Filter>Source Files\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Public\Mesh.h">
+      <Filter>Source Files\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Public\Material.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

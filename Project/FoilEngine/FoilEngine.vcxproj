@@ -68,7 +68,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>glfw3.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glfw3.lib;opengl32.lib;assimp-vc143-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -91,13 +91,19 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\Source\glad.c" />
+    <ClCompile Include="..\Source\Private\Material.cpp" />
+    <ClCompile Include="..\Source\Private\Mesh.cpp" />
     <ClCompile Include="..\Source\Private\Shader.cpp" />
-    <ClCompile Include="..\Source\Private\TextureInitializer.cpp" />
+    <ClCompile Include="..\Source\Private\Texture.cpp" />
+    <ClCompile Include="..\Source\Private\TransformHelper.cpp" />
     <ClCompile Include="..\Source\Private\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Source\Public\Material.h" />
+    <ClInclude Include="..\Source\Public\Mesh.h" />
     <ClInclude Include="..\Source\Public\Shader.h" />
-    <ClInclude Include="..\Source\Public\TextureInitializer.h" />
+    <ClInclude Include="..\Source\Public\Texture.h" />
+    <ClInclude Include="..\Source\Public\TransformHelper.h" />
     <ClInclude Include="..\Source\Public\Window.h" />
   </ItemGroup>
   <ItemGroup>

@@ -4,15 +4,11 @@
 #include <fstream>
 #include <iostream>
 #include <Shader.h>
-#include <TextureInitializer.h>
-
-/*Questions so far :
-*	- Why use * in some declarations? - This accesses the content
-*	- Why use & in some declarations? - This is a pointer declaration
-*	- What does glfwSwapBuffers do behind the scenes? - Swap buffers for things such as double buffering
-*	- what is a const char?
-*	- why return -1 in some cases?
-*/
+#include <Mesh.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <Material.h>
 
 void processInput(GLFWwindow* window)
 {
@@ -30,28 +26,38 @@ static void OnGlfwWindowResizeCallback(GLFWwindow* window, int width, int height
 	glViewport(0, 0, width, height);
 }
 
-float vertices[] = {
-	-0.5f, -0.5f, 0.0f,
-	 0.5f, -0.5f, 0.0f,
-	 0.0f,  0.5f, 0.0f
-};
-float uv[] =
+vector<glm::vec3> vertices = 
 {
-	0.0f, 0.0f,
-	1.0f, 0.0f,
-	0.5f, 1.0f
+	glm::vec3(	- 0.5f, -0.5f, 0.0f	),
+	glm::vec3(	0.5f, -0.5f, 0.0f	),
+	glm::vec3(	0.0f,  0.5f, 0.0f	)
 };
-float colors[] =
+vector<glm::vec2> uvs =
 {
-	1.0f,0.0f,0.0f,1.0f,
-	0.0f,1.0f,0.0f,1.0f,
-	0.0f,0.0f,1.0f,1.0f
+	glm::vec2(0.0f, 0.0f),
+	glm::vec2(1.0f, 0.0f),
+	glm::vec2(0.5f, 1.0f)
+};
+vector<glm::vec3> normals =
+{
+	glm::vec3(1.0f,0.0f,0.0f),
+	glm::vec3(0.0f,1.0f,0.0f),
+	glm::vec3(0.0f,0.0f,1.0f)
+};
+vector<glm::vec4> colors =
+{
+	glm::vec4(1.0f,0.0f,0.0f,1.0f),
+	glm::vec4(0.0f,1.0f,0.0f,1.0f),
+	glm::vec4(0.0f,0.0f,1.0f,1.0f)
 };
 
+int width = 800;
+int height = 600;
 
 int main()
 {
 #pragma region System Initialization
+
 	// GLFW Initialization and OpenGL setup
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -61,7 +67,7 @@ int main()
 	// GLFW Window Initialization
 	// ---------------------
 
-	GLFWwindow* window = glfwCreateWindow(800, 600, "Test Window", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(800, 600, "Foil", NULL, NULL);
 	if (window == NULL)
 	{
 		std::cout << "Failed to create a GLFW Window." << std::endl;
@@ -90,43 +96,46 @@ int main()
 
 #pragma region Mesh Handler
 
-	//Vertex Array Object - Attributes
-	GLuint AttributeVAO; //VAO Handler
-	glGenVertexArrays(1, &AttributeVAO); //Generate Attribute Array
-	glBindVertexArray(AttributeVAO); //VAO Bind is parallel to VBO Bind
-	
-	//Vertex Buffer Object
-	GLuint VertexVBO[3]; //0 = Vertex, 1 = UV, 2 = Color
-	glGenBuffers(3, VertexVBO); //Generate Vertex Buffer VBO
-	
-	glBindBuffer(GL_ARRAY_BUFFER, VertexVBO[0]); //Binds VBO ID to an Array Buffer - All operations will be applied on that buffer until the next bind
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); //Copy vertex position data to buffer. Similar to compute buffer declaration
-
-	//Setup Vertex Attribute for VBO[0]
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 3, (void*)(sizeof(GLfloat) * 0));
-	glEnableVertexAttribArray(0);
-
-	//UV VBO
-	glBindBuffer(GL_ARRAY_BUFFER, VertexVBO[1]); //Binds VBO ID to an Array Buffer - All operations will be applied on that buffer until the next bind
-	glBufferData(GL_ARRAY_BUFFER, sizeof(uv), uv, GL_STATIC_DRAW);  //Copy uv data to buffer.
-
-	//Setup Vertex Attribute for VBO[1]
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 2, (void*)(sizeof(GLfloat) * 0));
-	glEnableVertexAttribArray(1);
-
-	//Color VBO
-	glBindBuffer(GL_ARRAY_BUFFER, VertexVBO[2]); //Binds VBO ID to an Array Buffer - All operations will be applied on that buffer until the next bind
-	glBufferData(GL_ARRAY_BUFFER, sizeof(colors), colors, GL_STATIC_DRAW);  //Copy vertex color data to buffer.
-
-	//Setup Vertex Attribute for VBO[2]
-	glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 4, (void*)(sizeof(GLfloat) * 0));
-	glEnableVertexAttribArray(2);
+	Mesh mesh(vertices, uvs, normals, colors);
 
 #pragma endregion
 
+#pragma region Material Setup
+
+	//Shader Declaration
+	Shader shader("../../Bin/Shaders/vsh.glsl", "../../Bin/Shaders/fsh.glsl");
+
 	//Texture Allocation
-	TextureInitializer textureObject("../../Bin/Assets/Textures/kirbo.png", 0);
-	Shader meshShader("../../Bin/Shaders/vsh.glsl", "../../Bin/Shaders/fsh.glsl"); //Shader Declaration from Shader.cpp
+	Texture kirbyTexture("../../Bin/Assets/Textures/kirbo.png");
+	Texture checkerTexture("../../Bin/Assets/Textures/T_CheckerSimple.png");
+	Material mat(shader);
+
+	//Texture Bind to Material
+	mat.AddTextureParam("mainTex", &kirbyTexture);
+	mat.AddTextureParam("overlayTex", &checkerTexture);
+
+#pragma endregion
+
+#pragma region Transforms
+
+	//Matrices
+	glm::mat4 meshTransform = glm::mat4(1.0f); //Identity Matrix
+	glm::mat4 m;
+	{
+		//TODO: clean this later
+		glm::mat4 meshT = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
+		glm::mat4 meshR = glm::rotate(glm::mat4(1.0f), glm::radians(70.0f), glm::vec3(1, 0, 0));
+		glm::mat4 meshS = glm::scale(glm::mat4(1.0f), glm::vec3(1, 1, 1));
+		m = meshT * meshR * meshS;
+	}
+	glm::mat4 cameraT = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -3.0f));
+	glm::mat4 cameraR = glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(1, 0, 0));
+	glm::mat4 v = cameraT * cameraR;
+
+	glm::mat4 p = glm::perspective(glm::radians(45.0f), (float)width / (float)height, 0.1f, 100.0f);
+	GLuint transHandler = glGetUniformLocation(mat.shader.shaderProgramID, "transform"); //Link handler to shader property
+
+#pragma endregion
 
 #pragma region Render Loop
 	//Render Loop
@@ -137,16 +146,17 @@ int main()
 
 		processInput(window);
 
-		textureObject.Use();
-		glBindVertexArray(AttributeVAO);
-		meshShader.Use();
+		mat.Use();
+
+		//Transformations
+		meshTransform = p * v * m;
+		glUniformMatrix4fv(transHandler, 1, GL_FALSE, glm::value_ptr(meshTransform));
 
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
-
 	//If the Render loop has stopped, clean and close.
 	glfwTerminate();
 	return 0;
