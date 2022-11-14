@@ -14,9 +14,9 @@ public:
 	vector<GLint> parameterHandlers;
 	vector<GLuint> textureHandlers;
 
+	Material() = default;
 	Material(const Shader& shader);
 	//void AddScalarParam(const GLchar* paramName, const float value);
 	void AddTextureParam(const GLchar* paramName, const Texture* texture);
 	void Use();
 };
-

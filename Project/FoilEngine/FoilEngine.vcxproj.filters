@@ -36,10 +36,16 @@
     <ClCompile Include="..\Source\Private\TransformHelper.cpp">
       <Filter>Source Files\Private</Filter>
     </ClCompile>
-    <ClCompile Include="..\Source\Private\Mesh.cpp">
+    <ClCompile Include="..\Source\Private\SubMesh.cpp">
       <Filter>Source Files\Private</Filter>
     </ClCompile>
     <ClCompile Include="..\Source\Private\Material.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Private\Renderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Private\Mesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -56,10 +62,16 @@
     <ClInclude Include="..\Source\Public\TransformHelper.h">
       <Filter>Source Files\Public</Filter>
     </ClInclude>
-    <ClInclude Include="..\Source\Public\Mesh.h">
+    <ClInclude Include="..\Source\Public\SubMesh.h">
       <Filter>Source Files\Public</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\Public\Material.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Public\Renderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Public\Mesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

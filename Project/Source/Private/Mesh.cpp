@@ -1,50 +1,92 @@
 #include "Mesh.h"
 
-Mesh::Mesh(vector<glm::vec3> vertices, vector<glm::vec2> uvs, vector<glm::vec3> normals, vector<glm::vec4> colors)
+Mesh::Mesh(const char* path)
 {
-	this->vertices = vertices;
-	this->uvs = uvs;
-	this->normals = normals;
-	this->colors = colors;
+	//Load Mesh File
+	Assimp::Importer importer;
+	const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
 
-	SetupMesh();
+	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+	{
+		std::cout << "ASIMP ERROR: " << importer.GetErrorString() << endl;
+		return; //Failed to load file, abort
+	}
+
+	std::cout << "Successfully loaded Model at " << path << endl;
+
+	//Get Submeshes from node
+	ProcessNode(scene->mRootNode, scene);
 }
 
-void Mesh::SetupMesh()
+void Mesh::ProcessNode(aiNode* node, const aiScene* scene)
 {
-	glGenVertexArrays(1, &VAO); //Generate Attribute Array
-	glBindVertexArray(VAO);		//VAO Bind is parallel to VBO Bind
+	std::cout << "No. Children: " << node->mNumChildren << endl;
+	std::cout << "No. Total Meshes: " << scene->mNumMeshes << endl;
 
-	glGenBuffers(4, VBO);		//Generate Vertex Buffer VBO
+	for (unsigned int i = 0; i < node->mNumChildren; i++)
+	{
+		std::cout << "Child: " << node->mChildren[i]->mName.C_Str() << endl;
+		std::cout << "No. Meshes: " << node->mChildren[i]->mNumMeshes << endl;
 
-	glBindBuffer(GL_ARRAY_BUFFER, VBO[0]); //Binds VBO ID to an Array Buffer - All operations will be applied on that buffer until the next bind
-	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * vertices.size(), vertices.data(), GL_STATIC_DRAW); //Copy vertex position data to buffer. Similar to compute buffer declaration
+		for (unsigned int j = 0; j < node->mChildren[i]->mNumMeshes; j++)
+		{
+			//aiMesh* subMesh = scene->mMeshes[node->mMeshes[j]];
+			aiMesh* subMesh = scene->mMeshes[node->mChildren[i]->mMeshes[j]];
 
-	//Setup Vertex Attribute for VBO[0]
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 3, (void*)(sizeof(GLfloat) * 0));
-	glEnableVertexAttribArray(0);
+			std::cout << "Processing submesh at " << subMesh << endl << "---" << endl;
 
-	//UV VBO
-	glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * uvs.size(), uvs.data(), GL_STATIC_DRAW);			//Copy uv data to buffer.
+			ProcessSubMesh(subMesh, scene);
+		}
+	}
+}
 
-	//Setup Vertex Attribute for VBO[1]
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 2, (void*)(sizeof(GLfloat) * 0));
-	glEnableVertexAttribArray(1);
+void Mesh::ProcessSubMesh(aiMesh* nodeMesh, const aiScene* scene)
+{
+	SubMesh subMesh;
+	std::cout << "No. of Vertices: "	<< nodeMesh->mNumVertices << endl;
+	std::cout << "No. of UVs: "			<< nodeMesh->mTextureCoords << endl;
+	std::cout << "No. of Colors: "	<< nodeMesh->GetNumColorChannels() << endl;
 
-	//Normal VBO
-	glBindBuffer(GL_ARRAY_BUFFER, VBO[2]); 
-	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * normals.size(), normals.data(), GL_STATIC_DRAW);	//Copy vertex normal data to buffer.
+	for (unsigned int i = 0; i < nodeMesh->mNumVertices; i++)
+	{
+		glm::vec4 vector4;
+		glm::vec3 vector3;
+		glm::vec2 vector2;
 
-	//Setup Vertex Attribute for VBO[3]
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 3, (void*)(sizeof(GLfloat) * 0));
-	glEnableVertexAttribArray(2);
+		vector3.x = nodeMesh->mVertices[i].x;
+		vector3.y = nodeMesh->mVertices[i].y;
+		vector3.z = nodeMesh->mVertices[i].z;
+		subMesh.vertices.push_back(vector3);
+		vector3 = glm::vec3{ 0,0,0 };
 
-	//Color VBO
-	glBindBuffer(GL_ARRAY_BUFFER, VBO[3]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec4) * colors.size(), colors.data(), GL_STATIC_DRAW);		//Copy vertex color data to buffer.
+		vector2.x = nodeMesh->mTextureCoords[0][i].x;
+		vector2.y = nodeMesh->mTextureCoords[0][i].y;
+		subMesh.uvs.push_back(vector2);
 
-	//Setup Vertex Attribute for VBO[3]
-	glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 4, (void*)(sizeof(GLfloat) * 0));
-	glEnableVertexAttribArray(3);
+		vector3.x = nodeMesh->mNormals[i].x;
+		vector3.y = nodeMesh->mNormals[i].y;
+		vector3.z = nodeMesh->mNormals[i].z;
+		subMesh.normals.push_back(vector3);
+
+		//vector4.r = nodeMesh->mColors[i]->r;
+		//vector4.g = nodeMesh->mColors[i]->g;
+		//vector4.b = nodeMesh->mColors[i]->b;
+		//vector4.a = nodeMesh->mColors[i]->a;
+		//subMesh.normals.push_back(vector4);
+	}
+
+	std::cout << "Number of Faces: " << nodeMesh->mNumFaces << endl;
+
+	for (unsigned int i = 0; i < nodeMesh->mNumFaces; i++)
+	{
+		aiFace face = nodeMesh->mFaces[i];
+		//std::cout << "Number of Indices: " << face.mNumIndices << endl;
+
+		for (unsigned int j = 0; j < face.mNumIndices; j++)
+		{
+			subMesh.indices.push_back(face.mIndices[j]);
+		}
+	}
+
+	subMeshes.push_back(subMesh);
 }

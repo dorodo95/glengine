@@ -2,13 +2,13 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <fstream>
-#include <iostream>
 #include <Shader.h>
 #include <Mesh.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <Material.h>
+#include <Renderer.h>
 
 void processInput(GLFWwindow* window)
 {
@@ -67,7 +67,7 @@ int main()
 	// GLFW Window Initialization
 	// ---------------------
 
-	GLFWwindow* window = glfwCreateWindow(800, 600, "Foil", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(width, height, "Foil", NULL, NULL);
 	if (window == NULL)
 	{
 		std::cout << "Failed to create a GLFW Window." << std::endl;
@@ -88,15 +88,17 @@ int main()
 	}
 
 	//Sets the buffer resolution
-	glViewport(0, 0, 800, 600);
+	glViewport(0, 0, width, height);
 
 	//Populate the callback with the new window size
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 #pragma endregion
 
+	glEnable(GL_DEPTH_TEST);
+
 #pragma region Mesh Handler
 
-	Mesh mesh(vertices, uvs, normals, colors);
+	Mesh mesh("../../Bin/Assets/Models/Luna.obj");
 
 #pragma endregion
 
@@ -106,34 +108,35 @@ int main()
 	Shader shader("../../Bin/Shaders/vsh.glsl", "../../Bin/Shaders/fsh.glsl");
 
 	//Texture Allocation
-	Texture kirbyTexture("../../Bin/Assets/Textures/kirbo.png");
-	Texture checkerTexture("../../Bin/Assets/Textures/T_CheckerSimple.png");
-	Material mat(shader);
+	Texture textureA("../../Bin/Assets/Textures/T_LunaBody_D.png");
+	Texture textureB("../../Bin/Assets/Textures/T_LunaHair_D.png");
+	
+	Material matBody(shader);
+	Material matHair(shader);
 
 	//Texture Bind to Material
-	mat.AddTextureParam("mainTex", &kirbyTexture);
-	mat.AddTextureParam("overlayTex", &checkerTexture);
+	matBody.AddTextureParam("mainTex", &textureA);
+	matHair.AddTextureParam("mainTex", &textureB);
+
+	vector<Material> materialList;
+	materialList.push_back(matBody);
+	materialList.push_back(matHair);
 
 #pragma endregion
+
+	Renderer renderer(mesh, materialList);
 
 #pragma region Transforms
 
 	//Matrices
 	glm::mat4 meshTransform = glm::mat4(1.0f); //Identity Matrix
-	glm::mat4 m;
-	{
-		//TODO: clean this later
-		glm::mat4 meshT = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
-		glm::mat4 meshR = glm::rotate(glm::mat4(1.0f), glm::radians(70.0f), glm::vec3(1, 0, 0));
-		glm::mat4 meshS = glm::scale(glm::mat4(1.0f), glm::vec3(1, 1, 1));
-		m = meshT * meshR * meshS;
-	}
-	glm::mat4 cameraT = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -3.0f));
-	glm::mat4 cameraR = glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(1, 0, 0));
+	
+	glm::mat4 cameraT = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -0.5f, -2.0f));
+	glm::mat4 cameraR = glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0, 1, 0));
 	glm::mat4 v = cameraT * cameraR;
 
-	glm::mat4 p = glm::perspective(glm::radians(45.0f), (float)width / (float)height, 0.1f, 100.0f);
-	GLuint transHandler = glGetUniformLocation(mat.shader.shaderProgramID, "transform"); //Link handler to shader property
+	glm::mat4 p = glm::perspective(glm::radians(35.0f), (float)width / (float)height, 0.1f, 100.0f);
+	GLuint transHandler = glGetUniformLocation(shader.shaderProgramID, "transform"); //Link handler to shader property
 
 #pragma endregion
 
@@ -141,12 +144,21 @@ int main()
 	//Render Loop
 	while (!glfwWindowShouldClose(window))
 	{
-		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClearColor(0.1f, 0.1f, 0.15f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		processInput(window);
 
-		mat.Use();
+		renderer.Draw();
+
+		glm::mat4 m;
+		{
+			//TODO: clean this later
+			glm::mat4 meshT = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
+			glm::mat4 meshR = glm::rotate(glm::mat4(1.0f), (float)glfwGetTime(), glm::vec3(0, 1, 0));
+			glm::mat4 meshS = glm::scale(glm::mat4(1.0f), glm::vec3(1, 1, 1));
+			m = meshT * meshR * meshS;
+		}
 
 		//Transformations
 		meshTransform = p * v * m;

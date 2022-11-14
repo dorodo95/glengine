@@ -14,7 +14,6 @@ Texture::Texture(const char* texturePath)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	
-	stbi_set_flip_vertically_on_load(true); //Unflip image
 	unsigned char* data = stbi_load(texturePath, &width, &height, &nChannels, STBI_rgb_alpha); //Loads Texture data and populates width, height and color channel info. Forces alpha
 	
 	if (!data)

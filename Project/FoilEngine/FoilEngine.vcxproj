@@ -93,6 +93,8 @@
     <ClCompile Include="..\Source\glad.c" />
     <ClCompile Include="..\Source\Private\Material.cpp" />
     <ClCompile Include="..\Source\Private\Mesh.cpp" />
+    <ClCompile Include="..\Source\Private\SubMesh.cpp" />
+    <ClCompile Include="..\Source\Private\Renderer.cpp" />
     <ClCompile Include="..\Source\Private\Shader.cpp" />
     <ClCompile Include="..\Source\Private\Texture.cpp" />
     <ClCompile Include="..\Source\Private\TransformHelper.cpp" />
@@ -101,6 +103,8 @@
   <ItemGroup>
     <ClInclude Include="..\Source\Public\Material.h" />
     <ClInclude Include="..\Source\Public\Mesh.h" />
+    <ClInclude Include="..\Source\Public\SubMesh.h" />
+    <ClInclude Include="..\Source\Public\Renderer.h" />
     <ClInclude Include="..\Source\Public\Shader.h" />
     <ClInclude Include="..\Source\Public\Texture.h" />
     <ClInclude Include="..\Source\Public\TransformHelper.h" />
