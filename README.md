@@ -13,7 +13,7 @@ Status:
 # Roadmap 
 (more like shopping list)
 
-- Create UBO for Transform Opertations
+- Create UBO for Transform Operations
 - Camera Stuff (Free Cam, UBO Helper)
 - Cleanup and documentation (my c++ is potato level)
 - IMGUI integration
