@@ -91,6 +91,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\Source\glad.c" />
+    <ClCompile Include="..\Source\Private\DebugGrid.cpp" />
     <ClCompile Include="..\Source\Private\Material.cpp" />
     <ClCompile Include="..\Source\Private\Mesh.cpp" />
     <ClCompile Include="..\Source\Private\SubMesh.cpp" />
@@ -101,6 +102,7 @@
     <ClCompile Include="..\Source\Private\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Source\Public\DebugGrid.h" />
     <ClInclude Include="..\Source\Public\Material.h" />
     <ClInclude Include="..\Source\Public\Mesh.h" />
     <ClInclude Include="..\Source\Public\SubMesh.h" />
@@ -112,6 +114,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Bin\Shaders\fsh.glsl" />
+    <None Include="..\..\Bin\Shaders\gridFSH.glsl" />
     <None Include="..\..\Bin\Shaders\vsh.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -2,9 +2,10 @@
 
 
 
-SubMesh::SubMesh(vector<glm::vec3> vertices, vector<glm::vec2> uvs, vector<glm::vec3> normals, vector<glm::vec4> colors)
+SubMesh::SubMesh(vector<glm::vec3> vertices, vector<unsigned int> indices, vector<glm::vec2> uvs, vector<glm::vec3> normals, vector<glm::vec4> colors)
 {
 	this->vertices = vertices;
+	this->indices = indices;
 	this->uvs = uvs;
 	this->normals = normals;
 	this->colors = colors;

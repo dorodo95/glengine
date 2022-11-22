@@ -21,7 +21,7 @@ public:
 	GLuint EBO;		//Element Buffer Object Handler
 
 	SubMesh() = default;
-	SubMesh(vector<glm::vec3> vertices, vector<glm::vec2> uvs, vector<glm::vec3> normals, vector<glm::vec4> colors);
+	SubMesh(vector<glm::vec3> vertices, vector<unsigned int> indices, vector<glm::vec2> uvs, vector<glm::vec3> normals, vector<glm::vec4> colors);
 	void InitializeSubMesh();
 
 };

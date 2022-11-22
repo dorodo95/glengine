@@ -9,6 +9,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <Material.h>
 #include <Renderer.h>
+#include <DebugGrid.h>
 
 void processInput(GLFWwindow* window)
 {
@@ -51,8 +52,8 @@ vector<glm::vec4> colors =
 	glm::vec4(0.0f,0.0f,1.0f,1.0f)
 };
 
-int width = 800;
-int height = 600;
+int width = 1600;
+int height = 1200;
 
 int main()
 {
@@ -106,17 +107,21 @@ int main()
 
 	//Shader Declaration
 	Shader shader("../../Bin/Shaders/vsh.glsl", "../../Bin/Shaders/fsh.glsl");
+	Shader gridShader("../../Bin/Shaders/vsh.glsl", "../../Bin/Shaders/gridFSH.glsl");
 
 	//Texture Allocation
 	Texture textureA("../../Bin/Assets/Textures/T_LunaBody_D.png");
 	Texture textureB("../../Bin/Assets/Textures/T_LunaHair_D.png");
+	Texture textureGrid("../../Bin/Assets/Textures/T_Grid.png");
 	
 	Material matBody(shader);
 	Material matHair(shader);
+	Material matGrid(gridShader);
 
 	//Texture Bind to Material
 	matBody.AddTextureParam("mainTex", &textureA);
 	matHair.AddTextureParam("mainTex", &textureB);
+	matGrid.AddTextureParam("mainTex", &textureGrid);
 
 	vector<Material> materialList;
 	materialList.push_back(matBody);
@@ -125,6 +130,8 @@ int main()
 #pragma endregion
 
 	Renderer renderer(mesh, materialList);
+	DebugGrid grid(25, matGrid);
+
 
 #pragma region Transforms
 
@@ -137,6 +144,7 @@ int main()
 
 	glm::mat4 p = glm::perspective(glm::radians(35.0f), (float)width / (float)height, 0.1f, 100.0f);
 	GLuint transHandler = glGetUniformLocation(shader.shaderProgramID, "transform"); //Link handler to shader property
+	GLuint transHandler2 = glGetUniformLocation(gridShader.shaderProgramID, "transform"); //Link handler to shader property
 
 #pragma endregion
 
@@ -144,6 +152,7 @@ int main()
 	//Render Loop
 	while (!glfwWindowShouldClose(window))
 	{
+
 		glClearColor(0.1f, 0.1f, 0.15f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -164,7 +173,9 @@ int main()
 		meshTransform = p * v * m;
 		glUniformMatrix4fv(transHandler, 1, GL_FALSE, glm::value_ptr(meshTransform));
 
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+
+		grid.DrawGridQuad();
+		glUniformMatrix4fv(transHandler2, 1, GL_FALSE, glm::value_ptr(meshTransform));
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
