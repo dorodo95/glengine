@@ -1,5 +1,8 @@
 #version 330 core
 
+//Grid Logic based on discussion from https://forum.unity.com/threads/antialiased-grid-lines-fwidth.1010668/.
+//Thanks to the folks at the Computação Gráfica discord server and Eduardo Righi for the idea!
+
 //Inputs must match vsh
 in vec2 iUV;
 in vec3 iNormal;
