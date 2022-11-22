@@ -3,7 +3,7 @@
 //Grid Logic based on discussion from https://forum.unity.com/threads/antialiased-grid-lines-fwidth.1010668/.
 //Thanks to the folks at the Computação Gráfica discord server and Eduardo Righi for the idea!
 
-//Inputs must match vsh
+//TODO: Move this to interface blocks
 in vec2 iUV;
 in vec3 iNormal;
 in vec3 iWorldPos;
@@ -126,7 +126,7 @@ void main()
 	
 	col = mix(col, vec4(0.8,0.1,0.3,1), axisGrid.x);	//X Axis
 	col = mix(col, vec4(0.02,0.4,0.9,1), axisGrid.y);	//Z Axis
-	col += min(axisGrid.x, axisGrid.y);					//Origin Point in white color
+	col += min(axisGrid.x, axisGrid.y);					//Origin Point
 	
 	gl_FragColor = col;
 }
